@@ -48,7 +48,6 @@ public class QuestWizardWindow extends WWindow implements InventoryMetaListener 
 	private final Collection<InventoryMetaItem> selectedItems = new ArrayList<>();
 	private final Collection<InventoryMetaItem> itemCandidates = new ArrayList<>();
 	private InventoryMetaItem selectedQuest;
-	private boolean isEnabled = true;
 	
 	public QuestWizardWindow() {
 		super(TITLE, true);
@@ -106,7 +105,7 @@ public class QuestWizardWindow extends WWindow implements InventoryMetaListener 
 		if ((currentTime - lastSearchQuestItemsTime) > searchNewQuestItemsTimeout) {
 			lastSearchQuestItemsTime = currentTime;
 
-			selectedItems.removeIf(item -> item == null);
+			selectedItems.removeIf(Objects::isNull);
 			// For supporting not player inventory containers
 			updateCandidateItemsHierarchy();
 		}
@@ -131,7 +130,6 @@ public class QuestWizardWindow extends WWindow implements InventoryMetaListener 
 	
 	public void toggle() {
 		hud.toggleComponent(this);
-		isEnabled = !isEnabled;
 	}
 
 	void childResized(FlexComponent child) {
@@ -386,20 +384,22 @@ public class QuestWizardWindow extends WWindow implements InventoryMetaListener 
 	// InventoryMetaListener
 
 	public void addInventoryItem(InventoryMetaItem item) {
-		if (!isEnabled) return;
+		if (selectedItems.isEmpty()) return;
+
 		itemCandidates.clear();
 		updateCandidateItems(selectedItems);
 		items.itemsCount = itemCandidates.size();
 	}
 
 	public void removeInventoryItem(InventoryMetaItem item) {
-		if (!isEnabled) return;
 		if (selectedQuest != null && item.getId() == selectedQuest.getId()) {
 			selectedQuest = null;
 			hintLabel.setLabel(questHint);
 
 			return;
 		}
+
+		if (selectedItems.isEmpty()) return;
 
 		itemCandidates.removeIf(candidate -> candidate.getId() == item.getId());
 		items.itemsCount = itemCandidates.size();
