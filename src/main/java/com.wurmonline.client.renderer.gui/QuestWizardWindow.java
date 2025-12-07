@@ -1,13 +1,15 @@
 package com.wurmonline.client.renderer.gui;
 
-import com.github.ragxar.wurm.client.mod.borabora.ItemSelectionFrame;
-import com.github.ragxar.wurm.client.mod.borabora.QuestCandidateItem;
+import com.github.ragxar.wurm.client.mod.ItemSelectionFrame;
+import com.github.ragxar.wurm.client.mod.QuestCandidateItem;
 
+import com.github.ragxar.wurm.client.mod.borabora.Strings;
 import com.wurmonline.client.game.inventory.InventoryMetaListener;
 import com.wurmonline.client.options.Options;
 import com.wurmonline.client.game.inventory.InventoryMetaItem;
 import com.wurmonline.client.game.inventory.InventoryMetaWindowManager;
 import com.wurmonline.client.game.inventory.InventoryMetaWindowView;
+import com.wurmonline.client.renderer.PickData;
 import com.wurmonline.client.renderer.backend.Queue;
 import com.wurmonline.client.renderer.gui.text.TextFont;
 import com.wurmonline.client.resources.textures.ResourceTexture;
@@ -20,18 +22,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class QuestWizardWindow extends WWindow implements InventoryMetaListener {
-	private static final String TITLE = "Bora Lite Quest Wizard";
+	private static final String TITLE = Strings.window.title.localized();
 	private final String questNamePrefix = "Quest: ";
-	private final String selectCountItemsHint = "Вы выбрали %d предметов.";
-	private final String itemStatusFormat = "Вы сдали %d предметов по заданию.";
-	private final String emptyCompatibleItems = "Подходящих для задания предметов не найдено.";
-	private final String questHint = "Перетащите квест и необходимые предметы для задания.";
+	private final String selectCountItemsHint = Strings.items.selectedFormat.localized();
+	private final String itemStatusFormat = Strings.items.statusFormat.localized();
+	private final String emptyCompatibleItems = Strings.items.emptyCompatible.localized();
+	private final String questHint = Strings.items.startedHint.localized();
 	private final PlayerAction addItemAction = new PlayerAction("questadditem", (short) 951, PlayerAction.ANYTHING);
 
 	private final WurmLabel hintLabel = new WurmLabel(questHint);
 	private final WurmLabel statusLabel = new WurmLabel("");
-	private final ItemSelectionFrame quest = new ItemSelectionFrame(14, 20, "Quest");
-	private final ItemSelectionFrame items = new ItemSelectionFrame(104, 20, "Items");
+	private final ItemSelectionFrame quest = new ItemSelectionFrame(14, 20, Strings.tooltip.quest.localized());
+	private final ItemSelectionFrame items = new ItemSelectionFrame(104, 20, Strings.tooltip.items.localized());
 
 	private final InventoryMetaWindowView playerInventory;
 	private WurmArrayPanel<FlexComponent> mainLayout;
@@ -280,6 +282,11 @@ public class QuestWizardWindow extends WWindow implements InventoryMetaListener 
 		quest.render(queue, x, y);
 		items.render(queue, x, y);
 	}
+
+    public void pick(PickData pickData, int xMouse, int yMouse) {
+        quest.pick(pickData, xMouse, yMouse);
+        items.pick(pickData, xMouse, yMouse);
+    }
 
 	protected void leftPressed(int xMouse, int yMouse, int clickCount) {
 		quest.leftPressed(xMouse, yMouse);

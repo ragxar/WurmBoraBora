@@ -1,4 +1,4 @@
-package com.github.ragxar.wurm.client.mod.borabora;
+package com.github.ragxar.wurm.client.mod;
 
 import com.wurmonline.client.game.inventory.InventoryMetaItem;
 import com.wurmonline.shared.util.MaterialUtilities;

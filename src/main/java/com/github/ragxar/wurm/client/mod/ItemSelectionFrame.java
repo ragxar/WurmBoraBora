@@ -1,6 +1,8 @@
-package com.github.ragxar.wurm.client.mod.borabora;
+package com.github.ragxar.wurm.client.mod;
 
+import com.github.ragxar.wurm.client.mod.borabora.Strings;
 import com.wurmonline.client.game.inventory.InventoryMetaItem;
+import com.wurmonline.client.renderer.PickData;
 import com.wurmonline.client.renderer.backend.Queue;
 import com.wurmonline.client.renderer.gui.*;
 import com.wurmonline.client.renderer.gui.text.TextFont;
@@ -14,7 +16,7 @@ public class ItemSelectionFrame {
     private final int maxCharacterToRender = 20;
     private final TextureButton frame;
     private Texture itemTexture;
-    private TextureButton removeButton;
+    private TextureButton clearButton;
     private final int frameWidth = 44;
     private final int frameheight = 44;
     private int x;
@@ -23,7 +25,7 @@ public class ItemSelectionFrame {
 
     public ItemSelectionFrame(int xPosition, int yPosition, String hoverText) {
         frame = new TextureButton("img.gui.paperdoll.frame", 44, 44, xPosition, yPosition, hoverText, 3, 21);
-        removeButton = new TextureButton("img.gui.crafting.remove", 20, 20, xPosition + 45, yPosition - 3, "Remove", 3, 21);
+        clearButton = new TextureButton("img.gui.crafting.remove", 20, 20, xPosition + 45, yPosition - 3, Strings.tooltip.clear.localized(), 3, 21);
     }
 
     public void clearTexture() {
@@ -36,9 +38,9 @@ public class ItemSelectionFrame {
         frame.loadTexture();
         frame.gameTick(windowX, windowY);
         frame.render(queue, false);
-        removeButton.loadTexture();
-        removeButton.gameTick(windowX, windowY);
-        removeButton.render(queue, removeButton.getIsToggled());
+        clearButton.loadTexture();
+        clearButton.gameTick(windowX, windowY);
+        clearButton.render(queue, clearButton.getIsToggled());
 
         if (itemTexture != null) {
             int x1 = x + frame.getLocalPositionX() + 3 + 5;
@@ -59,19 +61,27 @@ public class ItemSelectionFrame {
         return frame.checkIfHovered(xMouse, yMouse);
     }
 
+    public void pick(PickData pickData, int xMouse, int yMouse) {
+        clearButton.pick(pickData, xMouse, yMouse);
+        if (checkIfSlotHovered(xMouse, yMouse)) {
+            pickData.reset();
+            pickData.addText(frame.getPickDataText());
+        }
+    }
+
     public void leftPressed(int xMouse, int yMouse) {
-        if (removeButton.checkIfHovered(xMouse, yMouse)) {
-            removeButton.setIsToggled(true);
+        if (clearButton.checkIfHovered(xMouse, yMouse)) {
+            clearButton.setIsToggled(true);
         }
     }
 
     public void leftReleased(int xMouse, int yMouse) {
-        if (removeButton.checkIfHovered(xMouse, yMouse)) {
-            if (removeButton.getIsToggled()) {
+        if (clearButton.checkIfHovered(xMouse, yMouse)) {
+            if (clearButton.getIsToggled()) {
                 clearTexture();
             }
         }
-        removeButton.setIsToggled(false);
+        clearButton.setIsToggled(false);
     }
 
     public void setTexture(short iconId) {
