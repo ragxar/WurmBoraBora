@@ -29,7 +29,7 @@
         <!-- WurmClientMod submodules -->
         <dependency>
             <groupId>com.github.ragxar.wurm.client.mod</groupId>
-            <artifactId>i18n</artifactId>
+            <artifactId>resources</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- Wurm -->
