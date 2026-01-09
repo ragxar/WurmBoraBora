@@ -29,13 +29,27 @@ public class WurmBoraBora implements WurmClientMod, Initable, PreInitable, Confi
 
 	@Override
 	public void init() {
-		HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.HeadsUpDisplay", "init", "(II)V", () -> (proxy, method, args) -> {
-			method.invoke(proxy, args);
-
-			registerQuestWizardWindow((HeadsUpDisplay) proxy);
-
-			return null;
-		});
+        HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.HeadsUpDisplay", "init", "(II)V", () -> (proxy, method, args) -> {
+            Object invokeResult = method.invoke(proxy, args);
+            registerQuestWizardWindow((HeadsUpDisplay) proxy);
+            return invokeResult;
+        });
+        
+        HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.InventoryListComponent", "removeFakeInventoryItem", "(J)V", () -> (proxy, method, args) -> {
+            try {
+                return method.invoke(proxy, args);
+            } catch (Exception ignore) {
+                return null;
+            }
+        });
+        
+        HookManager.getInstance().registerHook("com.wurmonline.client.renderer.gui.InventoryListComponent", "removeInventoryItem", "(Lcom/wurmonline/client/game/inventory/InventoryMetaItem;)V", () -> (proxy, method, args) -> {
+            try {
+                return method.invoke(proxy, args);
+            } catch (Exception ignore) {
+                return null;
+            }
+        });
 	}
 
 	@Override
