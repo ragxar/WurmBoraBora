@@ -1,6 +1,7 @@
 package com.github.ragxar.wurm.client.mod;
 
 import com.github.ragxar.wurm.client.mod.borabora.Strings;
+import com.wurmonline.client.game.inventory.InventoryMetaItem;
 import com.wurmonline.client.renderer.gui.*;
 import com.wurmonline.client.settings.SavePosManager;
 import org.gotti.wurmunlimited.modloader.ReflectionUtil;
@@ -16,7 +17,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 
-public class WurmBoraBora extends InjectionTargetsWurmBoraBora implements WurmClientMod, Initable, PreInitable, Configurable {
+public class WurmBoraBora implements WurmClientMod, Initable, PreInitable, Configurable {
 	private final static Logger logger = Logger.getLogger(WurmBoraBora.class.getSimpleName());
     
     @Override
@@ -24,27 +25,7 @@ public class WurmBoraBora extends InjectionTargetsWurmBoraBora implements WurmCl
         GameHooks.initialize(this);
     }
     
-    @GameHooksMethod(targets = { InventoryListComponent.class })
-    public static void registerCrashFixHooks() {
-        logger.info("register client crash fix hooks");
-        HookManager.getInstance().registerHook(InventoryListComponent.getClassName(), "removeFakeInventoryItem", "(J)V", () -> (proxy, method, args) -> {
-            try {
-                return method.invoke(proxy, args);
-            } catch (Exception ignore) {
-                return null;
-            }
-        });
-        
-        HookManager.getInstance().registerHook(InventoryListComponent.getClassName(), "removeInventoryItem", "(Lcom/wurmonline/client/game/inventory/InventoryMetaItem;)V", () -> (proxy, method, args) -> {
-            try {
-                return method.invoke(proxy, args);
-            } catch (Exception ignore) {
-                return null;
-            }
-        });
-    }
-
-	@Override
+    @Override
 	public void preInit() {
 	}
 
@@ -53,6 +34,38 @@ public class WurmBoraBora extends InjectionTargetsWurmBoraBora implements WurmCl
         String language = properties.getProperty("language", "en");
         logger.info("Configure language as " + language);
         Strings.init(language, getClass().getName());
+    }
+    
+    @GameHooksMethod(targets = { InventoryListComponent.class, InventoryMetaItem.class })
+    public static void registerCrashFixTweaks() {
+        logger.info("register client crash fix tweaks");
+        HookManager.getInstance()
+            .registerHook(
+                IT.InventoryListComponent.getClassName(),
+                IT.method.removeFakeInventoryItem.name(),
+                "(J)V",
+                () -> (proxy, method, args) -> {
+                    try {
+                        return method.invoke(proxy, args);
+                    } catch (Exception ignore) {
+                        return null;
+                    }
+                }
+            );
+        
+        HookManager.getInstance()
+            .registerHook(
+                IT.InventoryListComponent.getClassName(),
+                IT.method.removeInventoryItem.name(),
+                String.format("(%s)V", IT.InventoryMetaItem.getSignature()),
+                () -> (proxy, method, args) -> {
+                    try {
+                        return method.invoke(proxy, args);
+                    } catch (Exception ignore) {
+                        return null;
+                    }
+                }
+            );
     }
     
     @GameHooksFinallyTask
@@ -82,5 +95,12 @@ public class WurmBoraBora extends InjectionTargetsWurmBoraBora implements WurmCl
                 }
             }
         };
+    }
+    
+    private static class IT implements InjectionTargetsWurmBoraBora {
+        enum method {
+            removeInventoryItem,
+            removeFakeInventoryItem
+        }
     }
 }
